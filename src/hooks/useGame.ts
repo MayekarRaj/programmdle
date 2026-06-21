@@ -4,13 +4,27 @@ import { TECH_DATA } from '@/data';
 import { compareEntry, getPuzzleNumber, MAX_GUESSES, validateGuess } from '@/lib/gameLogic';
 import { useTodayState } from './useTodayState';
 import { useStreak } from './useStreak';
+import { useLocalStorage } from './useLocalStorage';
+
+export interface PlayStats {
+  played: number;
+  wins: number;
+  distribution: number[];
+}
+
+const DEFAULT_PLAY_STATS: PlayStats = {
+  played: 0,
+  wins: 0,
+  distribution: Array(MAX_GUESSES).fill(0),
+};
 
 export function useGame(answerId: number) {
   const answer = useMemo(() => TECH_DATA.find((entry) => entry.id === answerId)!, [answerId]);
   const puzzleNum = useMemo(() => getPuzzleNumber(new Date()), []);
 
   const { savedState, saveState } = useTodayState(puzzleNum);
-  const { recordWin, recordLoss } = useStreak();
+  const { streak, recordWin, recordLoss } = useStreak();
+  const [playStats, setPlayStats] = useLocalStorage<PlayStats>('pgmdle-stats', DEFAULT_PLAY_STATS);
 
   const [guesses, setGuesses] = useState<Guess[]>([]);
   const [status, setStatus] = useState<GameStatus>('playing');
@@ -55,11 +69,26 @@ export function useGame(answerId: number) {
 
       if (newStatus === 'won') {
         recordWin(new Date().toISOString().slice(0, 10));
+        const distribution = [...playStats.distribution];
+        const index = newGuesses.length - 1;
+        distribution[index] = (distribution[index] ?? 0) + 1;
+        setPlayStats({ played: playStats.played + 1, wins: playStats.wins + 1, distribution });
       } else if (newStatus === 'lost') {
         recordLoss();
+        setPlayStats({ ...playStats, played: playStats.played + 1 });
       }
     },
-    [status, guessedIds, guesses, answer, saveState, recordWin, recordLoss],
+    [
+      status,
+      guessedIds,
+      guesses,
+      answer,
+      saveState,
+      recordWin,
+      recordLoss,
+      playStats,
+      setPlayStats,
+    ],
   );
 
   return {
@@ -70,5 +99,7 @@ export function useGame(answerId: number) {
     submitGuess,
     guessedIds,
     maxGuesses: MAX_GUESSES,
+    streak,
+    playStats,
   };
 }
