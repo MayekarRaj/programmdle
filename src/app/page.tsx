@@ -1,7 +1,13 @@
+import { GameBoard } from '@/components/GameBoard';
+import { TECH_DATA } from '@/data';
+import { getDailyAnswer } from '@/lib/gameLogic';
+
 export default function Home() {
+  const answer = getDailyAnswer(TECH_DATA, new Date());
+
   return (
-    <main className="min-h-screen bg-void flex items-center justify-center">
-      <p className="font-mono text-violet text-lg">programmdle — coming soon</p>
+    <main className="min-h-screen bg-void">
+      <GameBoard answerId={answer.id} />
     </main>
   );
 }
