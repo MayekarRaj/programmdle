@@ -84,19 +84,29 @@ export function SearchBar({ onGuess, guessedIds, disabled }: SearchBarProps) {
         value={query}
         disabled={disabled}
         placeholder="Guess a language, framework, or tool..."
+        aria-label="Guess a language, framework, or tool"
+        role="combobox"
+        aria-expanded={isOpen && results.length > 0}
+        aria-controls="search-results-listbox"
+        aria-autocomplete="list"
         onChange={(event) => setQuery(event.target.value)}
         onKeyDown={handleKeyDown}
         onFocus={() => setIsOpen(results.length > 0)}
         className="w-full rounded-md border border-[var(--border)] bg-surface px-3 py-2 text-sm text-[var(--text)] outline-none transition-[border-color,box-shadow] duration-150 hover:border-violet/40 focus:border-violet focus:shadow-[0_0_0_3px_rgba(124,106,247,0.15),0_0_16px_rgba(124,106,247,0.18)] disabled:opacity-50"
       />
       {isOpen && results.length > 0 && (
-        <ul className="absolute z-20 mt-1 w-full overflow-hidden rounded-md border border-[var(--border)] bg-surface2 shadow-lg">
+        <ul
+          id="search-results-listbox"
+          role="listbox"
+          className="absolute z-20 mt-1 w-full overflow-hidden rounded-md border border-[var(--border)] bg-surface2 shadow-lg"
+        >
           {results.map((entry, index) => (
-            <li key={entry.id}>
+            <li key={entry.id} role="option" aria-selected={index === highlightIndex}>
               <button
                 type="button"
                 onMouseEnter={() => setHighlightIndex(index)}
                 onClick={() => submit(entry)}
+                aria-label={`Guess ${entry.name}, ${entry.category}`}
                 className={`flex w-full items-center justify-between px-3 py-2 text-left text-sm ${
                   index === highlightIndex ? 'bg-surface3' : ''
                 }`}

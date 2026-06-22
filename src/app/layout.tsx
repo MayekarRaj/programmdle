@@ -13,9 +13,27 @@ const jetbrainsMono = JetBrains_Mono({
   variable: "--font-mono",
 });
 
+const SITE_URL = "https://programmdle.vercel.app";
+const TITLE = "Programmdle — Guess the Tech";
+const DESCRIPTION =
+  "Daily developer puzzle. Guess the programming language, framework, or library from 8 clues. 8 guesses. One puzzle a day.";
+
 export const metadata: Metadata = {
-  title: "Programmdle — Guess the Tech",
-  description: "Daily developer puzzle. Guess the programming language, framework, or library from 8 clues. 8 guesses. One puzzle a day.",
+  metadataBase: new URL(SITE_URL),
+  title: TITLE,
+  description: DESCRIPTION,
+  openGraph: {
+    title: TITLE,
+    description: DESCRIPTION,
+    url: SITE_URL,
+    siteName: "Programmdle",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: TITLE,
+    description: DESCRIPTION,
+  },
 };
 
 export default function RootLayout({

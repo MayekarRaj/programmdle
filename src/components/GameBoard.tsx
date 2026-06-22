@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useGame } from '@/hooks/useGame';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
+import { useColorblindMode } from '@/hooks/useColorblindMode';
 import { buildShareText } from '@/lib/gameLogic';
 import { Header } from './Header';
 import { SearchBar } from './SearchBar';
@@ -28,6 +29,7 @@ export function GameBoard({ answerId, puzzleNum }: GameBoardProps) {
     status,
     answer,
     newestGuessId,
+    announcement,
     submitGuess,
     guessedIds,
     maxGuesses,
@@ -38,6 +40,7 @@ export function GameBoard({ answerId, puzzleNum }: GameBoardProps) {
   const [modal, setModal] = useState<ModalKind>(null);
   const [showToast, setShowToast] = useState(false);
   const [hasSeenIntro, setHasSeenIntro] = useLocalStorage('pgmdle-seen', false);
+  const { enabled: colorblindEnabled, toggle: toggleColorblind } = useColorblindMode();
 
   useEffect(() => {
     if (!hasSeenIntro) {
@@ -63,6 +66,10 @@ export function GameBoard({ answerId, puzzleNum }: GameBoardProps) {
 
   return (
     <div className="mx-auto flex max-w-[1120px] flex-col gap-4 px-4 pb-8 sm:px-6 lg:px-8">
+      <div aria-live="polite" role="status" className="sr-only">
+        {announcement}
+      </div>
+
       <Header onStatsClick={() => setModal('stats')} onHowToPlayClick={() => setModal('howto')} />
 
       <div className="flex items-center justify-between text-xs text-[var(--text2)]">
@@ -126,7 +133,12 @@ export function GameBoard({ answerId, puzzleNum }: GameBoardProps) {
         </div>
       )}
 
-      <HowToPlayModal isOpen={modal === 'howto'} onClose={() => setModal(null)} />
+      <HowToPlayModal
+        isOpen={modal === 'howto'}
+        onClose={() => setModal(null)}
+        colorblindEnabled={colorblindEnabled}
+        onToggleColorblind={toggleColorblind}
+      />
       <StatsModal
         isOpen={modal === 'stats'}
         onClose={() => setModal(null)}

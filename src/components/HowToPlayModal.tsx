@@ -5,6 +5,8 @@ import { useEffect, useRef } from 'react';
 interface HowToPlayModalProps {
   isOpen: boolean;
   onClose: () => void;
+  colorblindEnabled: boolean;
+  onToggleColorblind: () => void;
 }
 
 const LEGEND = [
@@ -14,7 +16,12 @@ const LEGEND = [
   { color: 'bg-blue', label: 'Wrong era — arrow shows direction' },
 ];
 
-export function HowToPlayModal({ isOpen, onClose }: HowToPlayModalProps) {
+export function HowToPlayModal({
+  isOpen,
+  onClose,
+  colorblindEnabled,
+  onToggleColorblind,
+}: HowToPlayModalProps) {
   const dialogRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -82,10 +89,21 @@ export function HowToPlayModal({ isOpen, onClose }: HowToPlayModalProps) {
           <span className="rounded bg-teal/15 px-2 py-1 text-teal">Language</span>
           <span className="rounded bg-amber/15 px-2 py-1 text-amber">Multi-paradigm</span>
         </div>
+        <label className="mt-4 flex items-center justify-between gap-3 rounded-md border border-[var(--border)] px-3 py-2 text-xs text-[var(--text2)]">
+          <span>Colourblind mode (teal → orange)</span>
+          <input
+            type="checkbox"
+            checked={colorblindEnabled}
+            onChange={onToggleColorblind}
+            aria-label="Toggle colourblind mode, swaps correct colour from teal to orange"
+            className="h-4 w-4 accent-violet"
+          />
+        </label>
+
         <button
           type="button"
           onClick={onClose}
-          className="mt-4 w-full rounded-md bg-surface2 py-2 text-xs font-bold hover:bg-surface3"
+          className="mt-3 w-full rounded-md bg-surface2 py-2 text-xs font-bold hover:bg-surface3"
         >
           Got it
         </button>
