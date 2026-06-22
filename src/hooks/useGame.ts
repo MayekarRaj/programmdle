@@ -1,7 +1,13 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { Guess, GameStatus } from '@/types';
 import { TECH_DATA } from '@/data';
-import { compareEntry, MAX_GUESSES, validateGuess } from '@/lib/gameLogic';
+import {
+  buildGuessAnnouncement,
+  buildOutcomeAnnouncement,
+  compareEntry,
+  MAX_GUESSES,
+  validateGuess,
+} from '@/lib/gameLogic';
 import { useTodayState } from './useTodayState';
 import { useStreak } from './useStreak';
 import { useLocalStorage } from './useLocalStorage';
@@ -28,6 +34,7 @@ export function useGame(answerId: number, puzzleNum: number) {
   const [guesses, setGuesses] = useState<Guess[]>([]);
   const [status, setStatus] = useState<GameStatus>('playing');
   const [newestGuessId, setNewestGuessId] = useState<number | null>(null);
+  const [announcement, setAnnouncement] = useState('');
 
   useEffect(() => {
     if (savedState.guessIds.length === 0) {
@@ -68,6 +75,11 @@ export function useGame(answerId: number, puzzleNum: number) {
       setNewestGuessId(entry.id);
       saveState(newGuesses.map((guess) => guess.entry.id), newStatus);
 
+      const guessAnnouncement = buildGuessAnnouncement({ entry, results });
+      const outcomeAnnouncement =
+        newStatus === 'playing' ? '' : ` ${buildOutcomeAnnouncement(newStatus, answer, newGuesses.length)}`;
+      setAnnouncement(`${guessAnnouncement}${outcomeAnnouncement}`);
+
       if (newStatus === 'won') {
         recordWin(new Date().toISOString().slice(0, 10));
         const distribution = [...playStats.distribution];
@@ -98,6 +110,7 @@ export function useGame(answerId: number, puzzleNum: number) {
     answer,
     puzzleNum,
     newestGuessId,
+    announcement,
     submitGuess,
     guessedIds,
     maxGuesses: MAX_GUESSES,

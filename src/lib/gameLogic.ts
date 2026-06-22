@@ -125,6 +125,49 @@ export function buildShareText(guesses: Guess[], puzzleNum: number, maxGuesses: 
   return [header, '', ...rows, '', 'programmdle.dev'].join('\n');
 }
 
+const ATTRIBUTE_LABELS: Record<string, string> = {
+  category: 'Category',
+  paradigm: 'Paradigm',
+  primaryUse: 'Use case',
+  typing: 'Typing',
+  yearBand: 'Era',
+  origin: 'Origin',
+  openSource: 'Open source',
+  platform: 'Platform',
+};
+
+const STATE_DESCRIPTIONS: Record<CellState, string> = {
+  green: 'correct',
+  amber: 'partial match',
+  gray: 'incorrect',
+  blue: 'wrong era',
+};
+
+function describeResult(result: GuessResult): string {
+  const baseLabel = result.label.replace(/ [↑↓]$/, '');
+  const description =
+    result.state === 'blue'
+      ? `wrong era, answer is ${result.label.endsWith('↑') ? 'later' : 'earlier'}`
+      : STATE_DESCRIPTIONS[result.state];
+
+  return `${ATTRIBUTE_LABELS[result.attribute]}: ${baseLabel}, ${description}.`;
+}
+
+export function buildGuessAnnouncement(guess: Guess): string {
+  return `Guessed ${guess.entry.name}. ${guess.results.map(describeResult).join(' ')}`;
+}
+
+export function buildOutcomeAnnouncement(
+  status: 'won' | 'lost',
+  answer: TechEntry,
+  guessCount: number,
+): string {
+  if (status === 'won') {
+    return `Correct! The answer was ${answer.name}. Solved in ${guessCount} guesses.`;
+  }
+  return `Out of guesses. The answer was ${answer.name}.`;
+}
+
 export function validateGuess(
   name: string,
   data: TechEntry[],
