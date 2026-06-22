@@ -1,10 +1,10 @@
 import { GuessCell } from './GuessCell';
+import { GRID_COLUMNS } from './gridLayout';
 
 interface EmptyRowProps {
   fadeLevel?: number;
 }
 
-const GRID_COLUMNS = '130px repeat(8, 1fr)';
 const CELL_COUNT = 9;
 
 export function EmptyRow({ fadeLevel = 0 }: EmptyRowProps) {

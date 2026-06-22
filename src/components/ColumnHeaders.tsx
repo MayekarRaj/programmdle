@@ -1,3 +1,5 @@
+import { GRID_COLUMNS } from './gridLayout';
+
 const LABELS = [
   'Name',
   'Category',
@@ -10,8 +12,6 @@ const LABELS = [
   'Platform',
 ];
 
-const GRID_COLUMNS = '130px repeat(8, 1fr)';
-
 export function ColumnHeaders() {
   return (
     <div
@@ -21,7 +21,7 @@ export function ColumnHeaders() {
       {LABELS.map((label) => (
         <div
           key={label}
-          className="truncate text-center font-mono text-[9px] uppercase tracking-wide text-[var(--text3)]"
+          className="min-w-0 truncate text-center font-mono text-[11px] uppercase tracking-wide text-[var(--text3)]"
         >
           {label}
         </div>
