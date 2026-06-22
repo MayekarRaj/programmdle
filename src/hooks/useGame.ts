@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { Guess, GameStatus } from '@/types';
 import { TECH_DATA } from '@/data';
-import { compareEntry, getPuzzleNumber, MAX_GUESSES, validateGuess } from '@/lib/gameLogic';
+import { compareEntry, MAX_GUESSES, validateGuess } from '@/lib/gameLogic';
 import { useTodayState } from './useTodayState';
 import { useStreak } from './useStreak';
 import { useLocalStorage } from './useLocalStorage';
@@ -18,9 +18,8 @@ const DEFAULT_PLAY_STATS: PlayStats = {
   distribution: Array(MAX_GUESSES).fill(0),
 };
 
-export function useGame(answerId: number) {
+export function useGame(answerId: number, puzzleNum: number) {
   const answer = useMemo(() => TECH_DATA.find((entry) => entry.id === answerId)!, [answerId]);
-  const puzzleNum = useMemo(() => getPuzzleNumber(new Date()), []);
 
   const { savedState, saveState } = useTodayState(puzzleNum);
   const { streak, recordWin, recordLoss } = useStreak();
@@ -28,6 +27,7 @@ export function useGame(answerId: number) {
 
   const [guesses, setGuesses] = useState<Guess[]>([]);
   const [status, setStatus] = useState<GameStatus>('playing');
+  const [newestGuessId, setNewestGuessId] = useState<number | null>(null);
 
   useEffect(() => {
     if (savedState.guessIds.length === 0) {
@@ -65,6 +65,7 @@ export function useGame(answerId: number) {
 
       setGuesses(newGuesses);
       setStatus(newStatus);
+      setNewestGuessId(entry.id);
       saveState(newGuesses.map((guess) => guess.entry.id), newStatus);
 
       if (newStatus === 'won') {
@@ -96,6 +97,7 @@ export function useGame(answerId: number) {
     status,
     answer,
     puzzleNum,
+    newestGuessId,
     submitGuess,
     guessedIds,
     maxGuesses: MAX_GUESSES,

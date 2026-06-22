@@ -15,24 +15,25 @@ import { StatsModal } from './StatsModal';
 
 interface GameBoardProps {
   answerId: number;
+  puzzleNum: number;
 }
 
 type ModalKind = 'howto' | 'stats' | null;
 
 const TOAST_DURATION_MS = 2000;
 
-export function GameBoard({ answerId }: GameBoardProps) {
+export function GameBoard({ answerId, puzzleNum }: GameBoardProps) {
   const {
     guesses,
     status,
     answer,
-    puzzleNum,
+    newestGuessId,
     submitGuess,
     guessedIds,
     maxGuesses,
     streak,
     playStats,
-  } = useGame(answerId);
+  } = useGame(answerId, puzzleNum);
 
   const [modal, setModal] = useState<ModalKind>(null);
   const [showToast, setShowToast] = useState(false);
@@ -61,7 +62,7 @@ export function GameBoard({ answerId }: GameBoardProps) {
   };
 
   return (
-    <div className="mx-auto flex max-w-2xl flex-col gap-4 px-4 pb-8">
+    <div className="mx-auto flex max-w-[1120px] flex-col gap-4 px-4 pb-8 sm:px-6 lg:px-8">
       <Header onStatsClick={() => setModal('stats')} onHowToPlayClick={() => setModal('howto')} />
 
       <div className="flex items-center justify-between text-xs text-[var(--text2)]">
@@ -91,15 +92,23 @@ export function GameBoard({ answerId }: GameBoardProps) {
 
       <SearchBar onGuess={submitGuess} guessedIds={guessedIds} disabled={isGameOver} />
 
-      <ColumnHeaders />
+      <div className="overflow-x-auto overscroll-x-contain [-webkit-overflow-scrolling:touch]">
+        <div className="flex w-fit min-w-full flex-col gap-2">
+          <ColumnHeaders />
 
-      <div className="flex flex-col gap-[3px]">
-        {guesses.map((guess) => (
-          <GuessRow key={guess.entry.id} guess={guess} />
-        ))}
-        {Array.from({ length: remainingSlots }).map((_, index) => (
-          <EmptyRow key={index} fadeLevel={isGameOver ? index + 1 : 0} />
-        ))}
+          <div className="flex flex-col gap-[3px]">
+            {guesses.map((guess) => (
+              <GuessRow
+                key={guess.entry.id}
+                guess={guess}
+                isNewest={guess.entry.id === newestGuessId}
+              />
+            ))}
+            {Array.from({ length: remainingSlots }).map((_, index) => (
+              <EmptyRow key={index} fadeLevel={isGameOver ? index + 1 : 0} />
+            ))}
+          </div>
+        </div>
       </div>
 
       {isGameOver && (
