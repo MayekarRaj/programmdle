@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import dynamic from 'next/dynamic';
 import { useGame } from '@/hooks/useGame';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { useColorblindMode } from '@/hooks/useColorblindMode';
@@ -11,8 +12,13 @@ import { ColumnHeaders } from './ColumnHeaders';
 import { GuessRow } from './GuessRow';
 import { EmptyRow } from './EmptyRow';
 import { StatusBanner } from './StatusBanner';
-import { HowToPlayModal } from './HowToPlayModal';
-import { StatsModal } from './StatsModal';
+
+const HowToPlayModal = dynamic(() => import('./HowToPlayModal').then((mod) => mod.HowToPlayModal), {
+  ssr: false,
+});
+const StatsModal = dynamic(() => import('./StatsModal').then((mod) => mod.StatsModal), {
+  ssr: false,
+});
 
 interface GameBoardProps {
   answerId: number;
@@ -140,20 +146,24 @@ export function GameBoard({ answerId, puzzleNum }: GameBoardProps) {
         </div>
       )}
 
-      <HowToPlayModal
-        isOpen={modal === 'howto'}
-        onClose={() => setModal(null)}
-        colorblindEnabled={colorblindEnabled}
-        onToggleColorblind={toggleColorblind}
-      />
-      <StatsModal
-        isOpen={modal === 'stats'}
-        onClose={() => setModal(null)}
-        streak={streak}
-        played={playStats.played}
-        wins={playStats.wins}
-        distribution={playStats.distribution}
-      />
+      {modal === 'howto' && (
+        <HowToPlayModal
+          isOpen
+          onClose={() => setModal(null)}
+          colorblindEnabled={colorblindEnabled}
+          onToggleColorblind={toggleColorblind}
+        />
+      )}
+      {modal === 'stats' && (
+        <StatsModal
+          isOpen
+          onClose={() => setModal(null)}
+          streak={streak}
+          played={playStats.played}
+          wins={playStats.wins}
+          distribution={playStats.distribution}
+        />
+      )}
     </div>
   );
 }
