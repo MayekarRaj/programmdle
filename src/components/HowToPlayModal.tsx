@@ -66,11 +66,12 @@ export function HowToPlayModal({
         ref={dialogRef}
         role="dialog"
         aria-modal="true"
+        aria-labelledby="how-to-play-modal-title"
         tabIndex={-1}
         onClick={(event) => event.stopPropagation()}
         className="max-w-md rounded-lg border border-[var(--border)] bg-surface p-6 text-sm text-[var(--text)]"
       >
-        <h2 className="mb-3 font-mono text-lg font-bold text-violet">How to Play</h2>
+        <h2 id="how-to-play-modal-title" className="mb-3 font-mono text-lg font-bold text-violet">How to Play</h2>
         <p className="mb-4 text-[var(--text2)]">
           Guess the hidden tech entry in 8 tries. Each guess reveals clues across 8 attributes:
           category, paradigm, use case, typing, era, origin, open source, and platform.

@@ -70,11 +70,12 @@ export function StatsModal({ isOpen, onClose, streak, played, wins, distribution
         ref={dialogRef}
         role="dialog"
         aria-modal="true"
+        aria-labelledby="stats-modal-title"
         tabIndex={-1}
         onClick={(event) => event.stopPropagation()}
         className="w-full max-w-md rounded-lg border border-[var(--border)] bg-surface p-6 text-sm text-[var(--text)]"
       >
-        <h2 className="mb-4 font-mono text-lg font-bold text-violet">Stats</h2>
+        <h2 id="stats-modal-title" className="mb-4 font-mono text-lg font-bold text-violet">Stats</h2>
         <div className="mb-4 grid grid-cols-4 gap-2 text-center">
           <StatCard label="Played" value={played} />
           <StatCard label="Win %" value={winRate} />
