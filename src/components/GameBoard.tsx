@@ -41,6 +41,7 @@ export function GameBoard({ answerId, puzzleNum }: GameBoardProps) {
   const [showToast, setShowToast] = useState(false);
   const [hasSeenIntro, setHasSeenIntro] = useLocalStorage('pgmdle-seen', false);
   const { enabled: colorblindEnabled, toggle: toggleColorblind } = useColorblindMode();
+  const [todayLabel, setTodayLabel] = useState('');
 
   useEffect(() => {
     if (!hasSeenIntro) {
@@ -48,6 +49,16 @@ export function GameBoard({ answerId, puzzleNum }: GameBoardProps) {
       setHasSeenIntro(true);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    setTodayLabel(
+      new Date().toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+      }),
+    );
   }, []);
 
   const isGameOver = status !== 'playing';
@@ -74,12 +85,8 @@ export function GameBoard({ answerId, puzzleNum }: GameBoardProps) {
 
       <div className="flex items-center justify-between text-xs text-[var(--text2)]">
         <span>
-          Puzzle #{puzzleNum} ·{' '}
-          {new Date().toLocaleDateString('en-US', {
-            month: 'short',
-            day: 'numeric',
-            year: 'numeric',
-          })}
+          Puzzle #{puzzleNum}
+          {todayLabel ? ` · ${todayLabel}` : ''}
         </span>
         <div className="flex gap-1">
           {Array.from({ length: maxGuesses }).map((_, index) => {
