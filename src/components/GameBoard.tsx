@@ -71,7 +71,7 @@ export function GameBoard({ answerId, puzzleNum }: GameBoardProps) {
   const remainingSlots = Math.max(0, maxGuesses - guesses.length);
 
   const handleShare = async () => {
-    const text = buildShareText(guesses, puzzleNum, maxGuesses);
+    const text = buildShareText(guesses, puzzleNum, maxGuesses, streak.current);
     try {
       await navigator.clipboard.writeText(text);
       setShowToast(true);

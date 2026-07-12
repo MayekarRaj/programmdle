@@ -112,17 +112,23 @@ const STATE_EMOJI: Record<CellState, string> = {
   blue: '🟦',
 };
 
-export function buildShareText(guesses: Guess[], puzzleNum: number, maxGuesses: number): string {
+export function buildShareText(
+  guesses: Guess[],
+  puzzleNum: number,
+  maxGuesses: number,
+  streak?: number,
+): string {
   const lastGuess = guesses[guesses.length - 1];
   const isWin = lastGuess !== undefined && lastGuess.results.every((r) => r.state === 'green');
   const countLabel = isWin ? String(guesses.length) : '✕';
 
-  const header = `programmdle #${puzzleNum} ${countLabel}/${maxGuesses}`;
+  const header = `Programmdle #${puzzleNum} — ${countLabel}/${maxGuesses}`;
   const rows = guesses.map((guess) =>
     guess.results.map((result) => STATE_EMOJI[result.state]).join(''),
   );
+  const streakLine = streak !== undefined && streak > 1 ? [`🔥 ${streak} day streak`] : [];
 
-  return [header, '', ...rows, '', 'programmdle.dev'].join('\n');
+  return [header, '', ...rows, ...streakLine, '', 'programmdle.dev'].join('\n');
 }
 
 const ATTRIBUTE_LABELS: Record<string, string> = {
