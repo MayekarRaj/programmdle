@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { useGame } from '@/hooks/useGame';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
@@ -70,6 +70,16 @@ export function GameBoard({ answerId, puzzleNum }: GameBoardProps) {
   const isGameOver = status !== 'playing';
   const remainingSlots = Math.max(0, maxGuesses - guesses.length);
 
+  const statusBannerRef = useRef<HTMLDivElement>(null);
+  const wasGameOverRef = useRef(isGameOver);
+
+  useEffect(() => {
+    if (isGameOver && !wasGameOverRef.current) {
+      statusBannerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+    wasGameOverRef.current = isGameOver;
+  }, [isGameOver]);
+
   const handleShare = async () => {
     const text = buildShareText(guesses, puzzleNum, maxGuesses, streak.current);
     try {
@@ -132,12 +142,14 @@ export function GameBoard({ answerId, puzzleNum }: GameBoardProps) {
       </div>
 
       {isGameOver && (
-        <StatusBanner
-          status={status === 'won' ? 'won' : 'lost'}
-          answer={answer}
-          guessCount={guesses.length}
-          onShare={handleShare}
-        />
+        <div ref={statusBannerRef}>
+          <StatusBanner
+            status={status === 'won' ? 'won' : 'lost'}
+            answer={answer}
+            guessCount={guesses.length}
+            onShare={handleShare}
+          />
+        </div>
       )}
 
       {showToast && (
