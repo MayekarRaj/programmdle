@@ -19,10 +19,13 @@ function isYesterday(dateStr: string, todayStr: string): boolean {
 export function useStreak() {
   const [streak, setStreak] = useLocalStorage<Streak>('pgmdle-streak', DEFAULT_STREAK);
 
+  // Returns the new streak length, or null if today's win was already recorded.
+  // Callers need the value synchronously (the `streak` state above is still the
+  // pre-win value until React re-renders).
   const recordWin = useCallback(
-    (todayStr: string) => {
+    (todayStr: string): number | null => {
       if (streak.lastWonDate === todayStr) {
-        return;
+        return null;
       }
 
       const current =
@@ -33,6 +36,8 @@ export function useStreak() {
         best: Math.max(streak.best, current),
         lastWonDate: todayStr,
       });
+
+      return current;
     },
     [streak, setStreak],
   );
