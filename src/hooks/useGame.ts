@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { track } from '@vercel/analytics/react';
 import type { Guess, GameStatus } from '@/types';
 import { TECH_DATA } from '@/data';
 import {
@@ -17,6 +18,8 @@ export interface PlayStats {
   wins: number;
   distribution: number[];
 }
+
+const STREAK_MILESTONES = [3, 7, 14, 30];
 
 const DEFAULT_PLAY_STATS: PlayStats = {
   played: 0,
@@ -80,12 +83,24 @@ export function useGame(answerId: number, puzzleNum: number) {
         newStatus === 'playing' ? '' : ` ${buildOutcomeAnnouncement(newStatus, answer, newGuesses.length)}`;
       setAnnouncement(`${guessAnnouncement}${outcomeAnnouncement}`);
 
+      if (newStatus !== 'playing') {
+        track('game_completed', {
+          result: newStatus === 'won' ? 'win' : 'loss',
+          guesses: newGuesses.length,
+          puzzleNumber: puzzleNum,
+        });
+      }
+
       if (newStatus === 'won') {
-        recordWin(new Date().toISOString().slice(0, 10));
+        const newStreak = recordWin(new Date().toISOString().slice(0, 10));
         const distribution = [...playStats.distribution];
         const index = newGuesses.length - 1;
         distribution[index] = (distribution[index] ?? 0) + 1;
         setPlayStats({ played: playStats.played + 1, wins: playStats.wins + 1, distribution });
+
+        if (newStreak !== null && STREAK_MILESTONES.includes(newStreak)) {
+          track('streak_milestone', { streak: newStreak });
+        }
       } else if (newStatus === 'lost') {
         recordLoss();
         setPlayStats({ ...playStats, played: playStats.played + 1 });
@@ -96,6 +111,7 @@ export function useGame(answerId: number, puzzleNum: number) {
       guessedIds,
       guesses,
       answer,
+      puzzleNum,
       saveState,
       recordWin,
       recordLoss,

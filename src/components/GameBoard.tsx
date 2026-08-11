@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
+import { track } from '@vercel/analytics/react';
 import { useGame } from '@/hooks/useGame';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { useColorblindMode } from '@/hooks/useColorblindMode';
@@ -81,6 +82,13 @@ export function GameBoard({ answerId, puzzleNum }: GameBoardProps) {
   }, [isGameOver]);
 
   const handleShare = async () => {
+    // Fired on click, before the clipboard write, so a clipboard failure
+    // (or a denied permission) doesn't swallow the event.
+    track('game_shared', {
+      result: status === 'won' ? 'win' : 'loss',
+      streak: streak.current,
+    });
+
     const text = buildShareText(guesses, puzzleNum, maxGuesses, streak.current);
     try {
       await navigator.clipboard.writeText(text);
